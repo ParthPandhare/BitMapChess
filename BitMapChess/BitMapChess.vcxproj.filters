@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="assets">
+      <UniqueIdentifier>{8b3aedd7-76fa-4a78-8410-42e3dba290e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assets\white">
+      <UniqueIdentifier>{45a3ab73-eb77-4ecf-8d1d-722ff7462cd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assets\black">
+      <UniqueIdentifier>{ea9f6b6a-1996-4838-b162-e8cdea3dff94}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\Game\Game\assets\black\bishop.png">
+      <Filter>assets\black</Filter>
+    </Image>
+    <Image Include="..\..\Game\Game\assets\black\king.png">
+      <Filter>assets\black</Filter>
+    </Image>
+    <Image Include="..\..\Game\Game\assets\black\knight.png">
+      <Filter>assets\black</Filter>
+    </Image>
+    <Image Include="..\..\Game\Game\assets\black\pawn.png">
+      <Filter>assets\black</Filter>
+    </Image>
+    <Image Include="..\..\Game\Game\assets\black\queen.png">
+      <Filter>assets\black</Filter>
+    </Image>
+    <Image Include="..\..\Game\Game\assets\black\rook.png">
+      <Filter>assets\black</Filter>
+    </Image>
+    <Image Include="..\..\Game\Game\assets\white\bishop.png">
+      <Filter>assets\white</Filter>
+    </Image>
+    <Image Include="..\..\Game\Game\assets\white\king.png">
+      <Filter>assets\white</Filter>
+    </Image>
+    <Image Include="..\..\Game\Game\assets\white\knight.png">
+      <Filter>assets\white</Filter>
+    </Image>
+    <Image Include="..\..\Game\Game\assets\white\pawn.png">
+      <Filter>assets\white</Filter>
+    </Image>
+    <Image Include="..\..\Game\Game\assets\white\queen.png">
+      <Filter>assets\white</Filter>
+    </Image>
+    <Image Include="..\..\Game\Game\assets\white\rook.png">
+      <Filter>assets\white</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="renderer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="constants.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
