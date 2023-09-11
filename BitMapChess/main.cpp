@@ -1,9 +1,21 @@
-#include <iostream>
-#include "SDL.h"
-#include "SDL_image.h"
+#include "renderer.h"
+#include "gameHandler.h"
+
+static Renderer* renderer = nullptr;
+static GameHandler* game = nullptr;
 
 int main(int argc, char* argv[])
 {
-	std::cout << "Hello World" << std::endl;
+	/*renderer = Renderer::getInstance();
+
+	while (renderer->isRunning())
+	{
+		renderer->handleEvents();
+		renderer->render();
+	}*/
+
+	game = GameHandler::getInstance();
+	game->displayMap(game->getAllLegalMoves()[55]);
+
 	return 0;
 }

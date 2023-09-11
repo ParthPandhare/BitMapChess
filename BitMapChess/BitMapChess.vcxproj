@@ -130,25 +130,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="gameHandler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\Game\Game\assets\black\bishop.png" />
-    <Image Include="..\..\Game\Game\assets\black\king.png" />
-    <Image Include="..\..\Game\Game\assets\black\knight.png" />
-    <Image Include="..\..\Game\Game\assets\black\pawn.png" />
-    <Image Include="..\..\Game\Game\assets\black\queen.png" />
-    <Image Include="..\..\Game\Game\assets\black\rook.png" />
-    <Image Include="..\..\Game\Game\assets\white\bishop.png" />
-    <Image Include="..\..\Game\Game\assets\white\king.png" />
-    <Image Include="..\..\Game\Game\assets\white\knight.png" />
-    <Image Include="..\..\Game\Game\assets\white\pawn.png" />
-    <Image Include="..\..\Game\Game\assets\white\queen.png" />
-    <Image Include="..\..\Game\Game\assets\white\rook.png" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="constants.h" />
+    <ClInclude Include="gameHandler.h" />
     <ClInclude Include="renderer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
