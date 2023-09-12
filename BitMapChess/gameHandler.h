@@ -66,6 +66,8 @@ private:
 	void generateLegalMoves();		// populates all_legal_moves_ with the current maps
 	bool isPieceAtPosition(int position);
 	bool isEnemyAtPosition(int position, int your_team);
+	void generateDiagonalMoves(int position, int team);
+	void generateStraightMoves(int position, int team);
 
 	/*
 	- piece_map_ is a bitmap storing the positions of all existing pieces on the board (1 if there is a piece, 0 otherwise)

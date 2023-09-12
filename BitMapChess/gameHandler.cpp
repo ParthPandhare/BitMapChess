@@ -119,6 +119,15 @@ void GameHandler::generateLegalMoves()
 			team = BLACK;
 		case pieces::W_BISHOP:
 		{
+			// iterates through bishop map, finds all bishops, and generates the legal moves for each piece
+			for (int position = 0; position < 64; ++position)
+			{
+				if (((pieces_[i] << position) & OCCUPIED) != 0)
+				{
+					all_legal_moves_[position] = 0;
+					generateDiagonalMoves(position, team);
+				}
+			}
 
 			break;
 		}
@@ -168,4 +177,112 @@ bool GameHandler::isEnemyAtPosition(int position, int your_team)
 	else if (your_team == BLACK && ((white_piece_map_ << position) & OCCUPIED) == 0)
 		return false;
 	return true;
+}
+
+void GameHandler::generateDiagonalMoves(int position, int team)
+{
+	int x_incr = 1;
+	int y_incr = 1;
+
+	// going to the right
+	if (position % 8 != 7)
+	{
+		// generating moves going down & to the right
+		while ((position + x_incr) % 8 <= 7 && (position + 8 * y_incr) / 8 <= 7)
+		{
+			int possible_move = position + x_incr + 8 * y_incr;
+
+			if (!isPieceAtPosition(possible_move))
+				all_legal_moves_[position] |= OCCUPIED >> possible_move;
+			else if (isEnemyAtPosition(possible_move, team))
+			{
+				all_legal_moves_[position] |= OCCUPIED >> possible_move;
+				break;
+			}
+			else
+				break;
+
+			if ((position + x_incr) % 8 == 7)
+				break;
+
+			x_incr++;
+			y_incr++;
+		}
+
+		x_incr = 1;
+		y_incr = 1;
+		// generating moves going up & to the right
+		while ((position + x_incr) % 8 <= 7 && (position - 8 * y_incr) / 8 >= 0)
+		{
+			int possible_move = position + x_incr - 8 * y_incr;
+
+			if (!isPieceAtPosition(possible_move))
+				all_legal_moves_[position] |= OCCUPIED >> possible_move;
+			else if (isEnemyAtPosition(possible_move, team))
+			{
+				all_legal_moves_[position] |= OCCUPIED >> possible_move;
+				break;
+			}
+			else
+				break;
+
+			if ((position + x_incr) % 8 == 7)
+				break;
+
+			x_incr++;
+			y_incr++;
+		}
+	}
+
+	// going to the left
+	if (position % 8 != 0)
+	{
+		x_incr = 1;
+		y_incr = 1;
+		// generating moves going down & to the left
+		while ((position - x_incr) % 8 >= 0 && (position + 8 * y_incr) / 8 <= 7)
+		{
+			int possible_move = position - x_incr + 8 * y_incr;
+
+			if (!isPieceAtPosition(possible_move))
+				all_legal_moves_[position] |= OCCUPIED >> possible_move;
+			else if (isEnemyAtPosition(possible_move, team))
+			{
+				all_legal_moves_[position] |= OCCUPIED >> possible_move;
+				break;
+			}
+			else
+				break;
+
+			if ((position - x_incr) % 8 == 0)
+				break;
+
+			x_incr++;
+			y_incr++;
+		}
+
+		x_incr = 1;
+		y_incr = 1;
+		// generating moves going up & to the left
+		while ((position - x_incr) % 8 >= 0 && (position - 8 * y_incr) / 8 >= 0)
+		{
+			int possible_move = position - x_incr - 8 * y_incr;
+
+			if (!isPieceAtPosition(possible_move))
+				all_legal_moves_[position] |= OCCUPIED >> possible_move;
+			else if (isEnemyAtPosition(possible_move, team))
+			{
+				all_legal_moves_[position] |= OCCUPIED >> possible_move;
+				break;
+			}
+			else
+				break;
+
+			if ((position - x_incr) % 8 == 0)
+				break;
+
+			x_incr++;
+			y_incr++;
+		}
+	}
 }
