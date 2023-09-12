@@ -36,7 +36,8 @@ public:
 
 private:
 	static Renderer* instance_ptr_;
-	Renderer() 
+	Renderer()
+		: promoting_(false, -1)
 	{
 		renderer_ = nullptr;
 		window_ = nullptr;
@@ -48,17 +49,22 @@ private:
 			pieces_[i] = nullptr;
 		is_running_ = false;
 		highlighted_squares_ = 0;
+		turn_ = WHITE;
 		init();
 	}
 
 	void loadImages();
 	void renderBoard();
-	void renderMap(uint64_t map, SDL_Texture* const piece);
+	void renderMap(uint64_t map, SDL_Texture* const piece); 
+	void renderPromotion();
 	void init();
 	void handleUserInput(int team, SDL_Event& event);
+	void handlePromotion();
 
 	bool is_running_;
+	std::pair<bool, int> promoting_;
 	uint64_t highlighted_squares_;
+	int turn_;
 
 	SDL_Renderer* renderer_;
 	SDL_Window* window_;

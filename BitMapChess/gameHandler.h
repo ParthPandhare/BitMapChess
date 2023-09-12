@@ -35,7 +35,8 @@ public:
 	uint64_t* getAllLegalMoves() { return all_legal_moves_; }
 	uint64_t getTeamMap(int team) { if (team == WHITE) return white_piece_map_; return black_piece_map_; }
 
-	void move(int team, int start_pos, int end_pos);
+	bool move(int team, int start_pos, int end_pos);		// true if a pawn is promoting, false otherwise
+	void promote(int position, int piece, int team);
 
 
 private:
@@ -70,6 +71,7 @@ private:
 	void generateStraightMoves(int position, int team);
 	void generateKnightMoves(int position, int team);
 	void generateKingMoves(int position, int team);
+	void generatePawnMoves(int position, int team);
 
 	/*
 	- piece_map_ is a bitmap storing the positions of all existing pieces on the board (1 if there is a piece, 0 otherwise)

@@ -36,7 +36,7 @@ void Renderer::handleEvents()
 	if (event.type == SDL_QUIT)
 		is_running_ = false;
 	else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
-		handleUserInput(WHITE, event);
+		handleUserInput(turn_, event);
 }
 
 void Renderer::render()
@@ -49,6 +49,7 @@ void Renderer::render()
 	renderBoard();
 	displayPieces(game->getPositions());
 	renderMap(highlighted_squares_, highlight_);	// renders highlights if any
+	renderPromotion();
 
 	SDL_RenderPresent(renderer_);
 }
@@ -131,6 +132,25 @@ void Renderer::renderMap(uint64_t map, SDL_Texture* const piece)
 	}
 }
 
+void Renderer::renderPromotion()
+{
+	if (promoting_.first == false)
+		return;
+
+	SDL_Rect dest_Rect;
+	dest_Rect.x = (promoting_.second % 8) * constants::SQUARE_DIMENSION;
+	dest_Rect.y = (promoting_.second / 8 - 3 * turn_) * constants::SQUARE_DIMENSION;
+	dest_Rect.h = constants::SQUARE_DIMENSION;
+	dest_Rect.w = constants::SQUARE_DIMENSION;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		SDL_RenderCopy(renderer_, promotion_, NULL, &dest_Rect);
+		SDL_RenderCopy(renderer_, pieces_[3 + i - 3 * turn_], NULL, &dest_Rect);
+		dest_Rect.y += turn_ * constants::SQUARE_DIMENSION;
+	}
+}
+
 void Renderer::handleUserInput(int team, SDL_Event& event)
 {
 	int start_pos = event.button.x / constants::SQUARE_DIMENSION + 8 * (event.button.y / constants::SQUARE_DIMENSION);
@@ -165,10 +185,84 @@ void Renderer::handleUserInput(int team, SDL_Event& event)
 
 	int end_pos = event.button.x / constants::SQUARE_DIMENSION + 8 * (event.button.y / constants::SQUARE_DIMENSION);
 
-	// if the user clicked a valid square to move to, move the piece; otherwise return
-	if (((highlighted_squares_ << end_pos) & OCCUPIED) != 0)
-		game->move(team, start_pos, end_pos);
+	// if the user clicked a valid square to move to, move the piece; if promoting, handle the promotion
+	if (((highlighted_squares_ << end_pos) & OCCUPIED) != 0 && game->move(team, start_pos, end_pos) == true)
+	{
+		promoting_.first = true;
+		promoting_.second = end_pos;
+		highlighted_squares_ = 0;
+		render();
+		handlePromotion();
+	}
 
 	highlighted_squares_ = 0;
 	return;
+}
+
+void Renderer::handlePromotion()
+{
+	SDL_Event event;
+	for (;;)
+	{
+		SDL_WaitEvent(&event);
+
+		if (event.type == SDL_QUIT)
+		{
+			is_running_ = false;
+			return;
+		}
+
+		if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT && event.button.x / constants::SQUARE_DIMENSION == promoting_.second % 8)
+		{
+			int y_clicked = event.button.y / constants::SQUARE_DIMENSION;
+			if (turn_ == WHITE)
+			{
+				if (y_clicked == 0)
+				{
+					game->promote(promoting_.second, pieces::W_QUEEN, turn_);
+					break;
+				}
+				else if (y_clicked == 1)
+				{
+					game->promote(promoting_.second, pieces::W_BISHOP, turn_);
+					break;
+				}
+				else if (y_clicked == 2)
+				{
+					game->promote(promoting_.second, pieces::W_KNIGHT, turn_);
+					break;
+				}
+				else if (y_clicked == 3)
+				{
+					game->promote(promoting_.second, pieces::W_ROOK, turn_);
+					break;
+				}
+			}
+			else if (turn_ == BLACK)
+			{
+				if (y_clicked == 7)
+				{
+					game->promote(promoting_.second, pieces::B_QUEEN, turn_);
+					break;
+				}
+				else if (y_clicked == 6)
+				{
+					game->promote(promoting_.second, pieces::B_BISHOP, turn_);
+					break;
+				}
+				else if (y_clicked == 5)
+				{
+					game->promote(promoting_.second, pieces::B_KNIGHT, turn_);
+					break;
+				}
+				else if (y_clicked == 4)
+				{
+					game->promote(promoting_.second, pieces::B_ROOK, turn_);
+					break;
+				}
+			}
+		}
+	}
+	promoting_.first = false;
+	promoting_.second = -1;
 }

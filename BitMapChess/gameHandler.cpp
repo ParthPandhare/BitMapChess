@@ -22,7 +22,7 @@ void GameHandler::displayMap(uint64_t map)
 	std::cout << "--------" << std::endl;
 }
 
-void GameHandler::move(int team, int start_pos, int end_pos)
+bool GameHandler::move(int team, int start_pos, int end_pos)
 {
 	// move the piece on the piece maps
 	for (int i = 0; i < 12; ++i)
@@ -61,6 +61,26 @@ void GameHandler::move(int team, int start_pos, int end_pos)
 	}
 
 	all_piece_map_ = white_piece_map_ | black_piece_map_;
+
+	// if a pawn is promoting
+	bool promoting = false;
+	if ((team == WHITE && end_pos / 8 == 0 && ((pieces_[pieces::W_PAWN] << end_pos) & OCCUPIED) != 0) || 
+		(team == BLACK && end_pos / 8 == 7 && ((pieces_[pieces::B_PAWN] << end_pos) & OCCUPIED) != 0))
+		promoting = true;
+
+	generateLegalMoves();
+	return promoting;
+}
+
+void GameHandler::promote(int position, int piece, int team)
+{
+	pieces_[piece] |= OCCUPIED >> position;
+
+	if (team == WHITE)
+		pieces_[pieces::W_PAWN] &= ~(OCCUPIED >> position);
+	else if (team == BLACK)
+		pieces_[pieces::B_PAWN] &= ~(OCCUPIED >> position);
+
 	generateLegalMoves();
 }
 
@@ -84,29 +104,7 @@ void GameHandler::generateLegalMoves()
 				{
 					// resets previous moves
 					all_legal_moves_[position] = 0;
-
-					// if promoting
-					
-
-					// forward moves, including double jump:
-					// if there is NOT a piece right infront of the pawn
-					if (!isPieceAtPosition(position + 8 * team))
-					{
-						all_legal_moves_[position] |= OCCUPIED >> position + team * 8;
-
-						// same thing but for double jump; checks if it's in starting square && if it can double jump:
-						if (position / 8 == 3.5 - 2.5 * team && !isPieceAtPosition(position + 16 * team))
-							all_legal_moves_[position] |= OCCUPIED >> position + team * 16;
-					}
-
-					// captures
-					// normal captures:
-					if (position % 8 != 7 && isEnemyAtPosition(position + team * 8 + 1, team))
-						all_legal_moves_[position] |= OCCUPIED >> position + team * 8 + 1;
-					if (position % 8 != 0 && isEnemyAtPosition(position + team * 8 - 1, team))
-						all_legal_moves_[position] |= OCCUPIED >> position + team * 8 - 1;
-
-					// en passants:
+					generatePawnMoves(position, team);
 				}
 				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 				{
@@ -201,6 +199,7 @@ void GameHandler::generateLegalMoves()
 				{
 					all_legal_moves_[position] = 0;
 					generateKingMoves(position, team);
+					break;
 				}
 				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 				{
@@ -548,4 +547,27 @@ void GameHandler::generateKingMoves(int position, int team)
 		if (!isPieceAtPosition(position + 7) || isEnemyAtPosition(position + 7, team))
 			all_legal_moves_[position] |= OCCUPIED >> position + 7;
 	}
+}
+
+void GameHandler::generatePawnMoves(int position, int team)
+{
+	// forward moves, including double jump:
+	// if there is NOT a piece right infront of the pawn
+	if (!isPieceAtPosition(position + 8 * team))
+	{
+		all_legal_moves_[position] |= OCCUPIED >> position + team * 8;
+
+		// same thing but for double jump; checks if it's in starting square && if it can double jump:
+		if (position / 8 == 3.5 - 2.5 * team && !isPieceAtPosition(position + 16 * team))
+			all_legal_moves_[position] |= OCCUPIED >> position + team * 16;
+	}
+
+	// captures
+	// normal captures:
+	if (position % 8 != 7 && isEnemyAtPosition(position + team * 8 + 1, team))
+		all_legal_moves_[position] |= OCCUPIED >> position + team * 8 + 1;
+	if (position % 8 != 0 && isEnemyAtPosition(position + team * 8 - 1, team))
+		all_legal_moves_[position] |= OCCUPIED >> position + team * 8 - 1;
+
+	// en passants:
 }
