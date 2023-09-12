@@ -195,7 +195,18 @@ void GameHandler::generateLegalMoves()
 			team = BLACK;
 		case pieces::W_KING:
 		{
-
+			for (int position = 0; position < 64; ++position)
+			{
+				if (((pieces_[i] << position) & OCCUPIED) != 0)
+				{
+					all_legal_moves_[position] = 0;
+					generateKingMoves(position, team);
+				}
+				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+				{
+					all_legal_moves_[position] = EMPTY;
+				}
+			}
 			break;
 		}
 		}
@@ -474,5 +485,67 @@ void GameHandler::generateKnightMoves(int position, int team)
 	{
 		if (!isPieceAtPosition(position - 17) || isEnemyAtPosition(position - 17, team))
 			all_legal_moves_[position] |= OCCUPIED >> position - 17;
+	}
+}
+
+void GameHandler::generateKingMoves(int position, int team)
+{
+	int x_pos = position % 8;
+	int y_pos = position / 8;
+
+	// top right
+	if (x_pos != 7 && y_pos != 0)
+	{
+		if (!isPieceAtPosition(position - 7) || isEnemyAtPosition(position - 7, team))
+			all_legal_moves_[position] |= OCCUPIED >> position - 7;
+	}
+
+	// top 
+	if (y_pos != 0)
+	{
+		if (!isPieceAtPosition(position - 8) || isEnemyAtPosition(position - 8, team))
+			all_legal_moves_[position] |= OCCUPIED >> position - 8;
+	}
+
+	// top left
+	if (x_pos != 0 && y_pos != 0)
+	{
+		if (!isPieceAtPosition(position - 9) || isEnemyAtPosition(position - 9, team))
+			all_legal_moves_[position] |= OCCUPIED >> position - 9;
+	}
+
+	// right
+	if (x_pos != 7)
+	{
+		if (!isPieceAtPosition(position + 1) || isEnemyAtPosition(position + 1, team))
+			all_legal_moves_[position] |= OCCUPIED >> position + 1;
+	}
+
+	// left
+	if (x_pos != 0)
+	{
+		if (!isPieceAtPosition(position - 1) || isEnemyAtPosition(position - 1, team))
+			all_legal_moves_[position] |= OCCUPIED >> position - 1;
+	}
+
+	// bottom right
+	if (x_pos != 0 && y_pos != 7)
+	{
+		if (!isPieceAtPosition(position + 9) || isEnemyAtPosition(position + 9, team))
+			all_legal_moves_[position] |= OCCUPIED >> position + 9;
+	}
+
+	// bottom 
+	if (y_pos != 7)
+	{
+		if (!isPieceAtPosition(position + 8) || isEnemyAtPosition(position + 8, team))
+			all_legal_moves_[position] |= OCCUPIED >> position + 8;
+	}
+
+	// bottom left
+	if (x_pos != 7 && y_pos != 7)
+	{
+		if (!isPieceAtPosition(position + 7) || isEnemyAtPosition(position + 7, team))
+			all_legal_moves_[position] |= OCCUPIED >> position + 7;
 	}
 }

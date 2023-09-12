@@ -69,6 +69,7 @@ private:
 	void generateDiagonalMoves(int position, int team);
 	void generateStraightMoves(int position, int team);
 	void generateKnightMoves(int position, int team);
+	void generateKingMoves(int position, int team);
 
 	/*
 	- piece_map_ is a bitmap storing the positions of all existing pieces on the board (1 if there is a piece, 0 otherwise)
