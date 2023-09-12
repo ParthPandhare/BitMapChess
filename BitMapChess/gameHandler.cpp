@@ -127,6 +127,10 @@ void GameHandler::generateLegalMoves()
 					all_legal_moves_[position] = 0;
 					generateDiagonalMoves(position, team);
 				}
+				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+				{
+					all_legal_moves_[position] = EMPTY;
+				}
 			}
 
 			break;
@@ -208,29 +212,31 @@ void GameHandler::generateDiagonalMoves(int position, int team)
 			x_incr++;
 			y_incr++;
 		}
-
-		x_incr = 1;
-		y_incr = 1;
-		// generating moves going up & to the right
-		while ((position + x_incr) % 8 <= 7 && (position - 8 * y_incr) / 8 >= 0)
+		if (position / 8 != 0)
 		{
-			int possible_move = position + x_incr - 8 * y_incr;
-
-			if (!isPieceAtPosition(possible_move))
-				all_legal_moves_[position] |= OCCUPIED >> possible_move;
-			else if (isEnemyAtPosition(possible_move, team))
+			x_incr = 1;
+			y_incr = 1;
+			// generating moves going up & to the right
+			while ((position + x_incr) % 8 <= 7 && (position - 8 * y_incr) / 8 >= 0)
 			{
-				all_legal_moves_[position] |= OCCUPIED >> possible_move;
-				break;
+				int possible_move = position + x_incr - 8 * y_incr;
+
+				if (!isPieceAtPosition(possible_move))
+					all_legal_moves_[position] |= OCCUPIED >> possible_move;
+				else if (isEnemyAtPosition(possible_move, team))
+				{
+					all_legal_moves_[position] |= OCCUPIED >> possible_move;
+					break;
+				}
+				else
+					break;
+
+				if ((position + x_incr) % 8 == 7)
+					break;
+
+				x_incr++;
+				y_incr++;
 			}
-			else
-				break;
-
-			if ((position + x_incr) % 8 == 7)
-				break;
-
-			x_incr++;
-			y_incr++;
 		}
 	}
 
@@ -260,29 +266,31 @@ void GameHandler::generateDiagonalMoves(int position, int team)
 			x_incr++;
 			y_incr++;
 		}
-
-		x_incr = 1;
-		y_incr = 1;
-		// generating moves going up & to the left
-		while ((position - x_incr) % 8 >= 0 && (position - 8 * y_incr) / 8 >= 0)
+		if (position / 8 != 0)
 		{
-			int possible_move = position - x_incr - 8 * y_incr;
-
-			if (!isPieceAtPosition(possible_move))
-				all_legal_moves_[position] |= OCCUPIED >> possible_move;
-			else if (isEnemyAtPosition(possible_move, team))
+			x_incr = 1;
+			y_incr = 1;
+			// generating moves going up & to the left
+			while ((position - x_incr) % 8 >= 0 && (position - 8 * y_incr) / 8 >= 0)
 			{
-				all_legal_moves_[position] |= OCCUPIED >> possible_move;
-				break;
+				int possible_move = position - x_incr - 8 * y_incr;
+
+				if (!isPieceAtPosition(possible_move))
+					all_legal_moves_[position] |= OCCUPIED >> possible_move;
+				else if (isEnemyAtPosition(possible_move, team))
+				{
+					all_legal_moves_[position] |= OCCUPIED >> possible_move;
+					break;
+				}
+				else
+					break;
+
+				if ((position - x_incr) % 8 == 0)
+					break;
+
+				x_incr++;
+				y_incr++;
 			}
-			else
-				break;
-
-			if ((position - x_incr) % 8 == 0)
-				break;
-
-			x_incr++;
-			y_incr++;
 		}
 	}
 }
