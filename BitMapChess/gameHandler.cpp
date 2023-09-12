@@ -27,7 +27,17 @@ void GameHandler::move(int team, int start_pos, int end_pos)
 	// move the piece on the piece maps
 	for (int i = 0; i < 12; ++i)
 	{
+		if ((pieces_[i] & OCCUPIED >> start_pos) != 0)
+		{
+			pieces_[i] ^= OCCUPIED >> start_pos;
+			pieces_[i] ^= OCCUPIED >> end_pos;
+		}
+		else if ((pieces_[i] & OCCUPIED >> start_pos) != 0)
+		{
+			pieces_[i] &= ~(OCCUPIED >> end_pos);
+		}
 
+		// en passants
 	}
 
 	// move the piece on the team maps
@@ -51,6 +61,7 @@ void GameHandler::move(int team, int start_pos, int end_pos)
 	}
 
 	all_piece_map_ = white_piece_map_ | black_piece_map_;
+	generateLegalMoves();
 }
 
 /* PRIVATE FUNCTIONS */
