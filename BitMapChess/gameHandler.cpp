@@ -132,7 +132,6 @@ void GameHandler::generateLegalMoves()
 					all_legal_moves_[position] = EMPTY;
 				}
 			}
-
 			break;
 		}
 		case pieces::B_KNIGHT:
@@ -146,14 +145,39 @@ void GameHandler::generateLegalMoves()
 			team = BLACK;
 		case pieces::W_ROOK:
 		{
-
+			// iteratres through rook maps, finds all rooks, & generates the legal moves for each piece
+			for (int position = 0; position < 64; ++position)
+			{
+				if (((pieces_[i] << position) & OCCUPIED) != 0)
+				{
+					all_legal_moves_[position] = 0;
+					generateStraightMoves(position, team);
+				}
+				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+				{
+					all_legal_moves_[position] = EMPTY;
+				}
+			}
 			break;
 		}
 		case pieces::B_QUEEN:
 			team = BLACK;
 		case pieces::W_QUEEN:
 		{
-
+			// same as rook & bishop, but combined
+			for (int position = 0; position < 64; ++position)
+			{
+				if (((pieces_[i] << position) & OCCUPIED) != 0)
+				{
+					all_legal_moves_[position] = 0;
+					generateStraightMoves(position, team);
+					generateDiagonalMoves(position, team);
+				}
+				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+				{
+					all_legal_moves_[position] = EMPTY;
+				}
+			}
 			break;
 		}
 		case pieces::B_KING:
@@ -292,5 +316,69 @@ void GameHandler::generateDiagonalMoves(int position, int team)
 				y_incr++;
 			}
 		}
+	}
+}
+
+void GameHandler::generateStraightMoves(int position, int team)
+{
+	int horizontal_position = position % 8;
+
+	// horizontally right moves:
+	for (int i = 0; i < 7 - horizontal_position; )
+	{
+		++i;
+		if (!isPieceAtPosition(position + i))
+			all_legal_moves_[position] |= OCCUPIED >> position + i;
+		else if (isEnemyAtPosition(position + i, team))
+		{
+			all_legal_moves_[position] |= OCCUPIED >> position + i;
+			break;
+		}
+		else break;
+	}
+
+	// horizontally left moves:
+	for (int i = 0; i < horizontal_position; )
+	{
+		++i;
+		if (!isPieceAtPosition(position - i))
+			all_legal_moves_[position] |= OCCUPIED >> position - i;
+		else if (isEnemyAtPosition(position - i, team))
+		{
+			all_legal_moves_[position] |= OCCUPIED >> position - i;
+			break;
+		}
+		else break;
+	}
+
+	// all up & down moves; same basic logic as the horizontal moves
+	int vertical_position = position / 8;
+
+	// vertical down moves:
+	for (int i = 0; i < 7 - vertical_position; )
+	{
+		++i;
+		if (!isPieceAtPosition(position + i * 8))
+			all_legal_moves_[position] |= OCCUPIED >> position + i * 8;
+		else if (isEnemyAtPosition(position + i * 8, team))
+		{
+			all_legal_moves_[position] |= OCCUPIED >> position + i * 8;
+			break;
+		}
+		else break;
+	}
+
+	// vertical up moves:
+	for (int i = 0; i < vertical_position; )
+	{
+		++i;
+		if (!isPieceAtPosition(position - i * 8))
+			all_legal_moves_[position] |= OCCUPIED >> position - i * 8;
+		else if (isEnemyAtPosition(position - i * 8, team))
+		{
+			all_legal_moves_[position] |= OCCUPIED >> position - i * 8;
+			break;
+		}
+		else break;
 	}
 }

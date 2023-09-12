@@ -149,7 +149,14 @@ void Renderer::handleUserInput(int team, SDL_Event& event)
 		SDL_WaitEvent(&event);
 	// wait for them to click again
 	while (event.type != SDL_MOUSEBUTTONDOWN)
+	{
 		SDL_WaitEvent(&event);
+		if (event.type == SDL_QUIT)
+		{
+			is_running_ = false;
+			return;
+		}
+	}
 	if (event.button.button != SDL_BUTTON_LEFT)
 	{
 		highlighted_squares_ = 0;
