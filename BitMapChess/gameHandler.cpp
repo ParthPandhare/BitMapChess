@@ -32,7 +32,7 @@ void GameHandler::move(int team, int start_pos, int end_pos)
 			pieces_[i] ^= OCCUPIED >> start_pos;
 			pieces_[i] ^= OCCUPIED >> end_pos;
 		}
-		else if ((pieces_[i] & OCCUPIED >> start_pos) != 0)
+		else if ((pieces_[i] & OCCUPIED >> end_pos) != 0)
 		{
 			pieces_[i] &= ~(OCCUPIED >> end_pos);
 		}
