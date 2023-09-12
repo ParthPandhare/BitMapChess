@@ -35,6 +35,8 @@ void Renderer::handleEvents()
 	SDL_WaitEvent(&event);
 	if (event.type == SDL_QUIT)
 		is_running_ = false;
+	else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
+		handleUserInput(WHITE, event);
 }
 
 void Renderer::render()
@@ -46,6 +48,7 @@ void Renderer::render()
 
 	renderBoard();
 	displayPieces(game->getPositions());
+	renderMap(highlighted_squares_, highlight_);	// renders highlights if any
 
 	SDL_RenderPresent(renderer_);
 }
@@ -107,6 +110,9 @@ void Renderer::renderBoard()
 
 void Renderer::renderMap(uint64_t map, SDL_Texture* const piece)
 {
+	if (map == 0)
+		return;
+
 	for (int y = 0; y < 8; ++y)
 	{
 		for (int x = 0; x < 8; ++x)
@@ -123,4 +129,39 @@ void Renderer::renderMap(uint64_t map, SDL_Texture* const piece)
 			map = map << 1;
 		}
 	}
+}
+
+void Renderer::handleUserInput(int team, SDL_Event& event)
+{
+	int start_pos = event.button.x / constants::SQUARE_DIMENSION + 8 * (event.button.y / constants::SQUARE_DIMENSION);
+
+	// checks to see if the user actually clicked one of their pieces & if it has any legal moves
+	if (((game->getTeamMap(team) << start_pos) & OCCUPIED) != 0 && game->getAllLegalMoves()[start_pos] != 0)
+	{
+		highlighted_squares_ = game->getAllLegalMoves()[start_pos];
+		render();
+	}
+	else
+		return;
+
+	// wait for them to un-click
+	while (event.type != SDL_MOUSEBUTTONUP)
+		SDL_WaitEvent(&event);
+	// wait for them to click again
+	while (event.type != SDL_MOUSEBUTTONDOWN)
+		SDL_WaitEvent(&event);
+	if (event.button.button != SDL_BUTTON_LEFT)
+	{
+		highlighted_squares_ = 0;
+		return;
+	}
+
+	int end_pos = event.button.x / constants::SQUARE_DIMENSION + 8 * (event.button.y / constants::SQUARE_DIMENSION);
+
+	// if the user clicked a valid square to move to, move the piece; otherwise return
+	if (((highlighted_squares_ << end_pos) & OCCUPIED) != 0)
+		game->move(team, start_pos, end_pos);
+
+	highlighted_squares_ = 0;
+	return;
 }

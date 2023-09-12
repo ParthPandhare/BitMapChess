@@ -22,6 +22,37 @@ void GameHandler::displayMap(uint64_t map)
 	std::cout << "--------" << std::endl;
 }
 
+void GameHandler::move(int team, int start_pos, int end_pos)
+{
+	// move the piece on the piece maps
+	for (int i = 0; i < 12; ++i)
+	{
+
+	}
+
+	// move the piece on the team maps
+	if (team == WHITE)
+	{
+		white_piece_map_ ^= OCCUPIED >> start_pos;
+		white_piece_map_ ^= OCCUPIED >> end_pos;
+		
+		black_piece_map_ &= ~(OCCUPIED >> end_pos);		// handles normal captures 
+
+		// if it's an en-passant 
+	}
+	else if (team == BLACK)
+	{
+		black_piece_map_ ^= OCCUPIED >> start_pos;
+		black_piece_map_ ^= OCCUPIED >> end_pos;
+
+		white_piece_map_ &= ~(OCCUPIED >> end_pos);		// handles normal captures 
+
+		// if it's an en-passant 
+	}
+
+	all_piece_map_ = white_piece_map_ | black_piece_map_;
+}
+
 /* PRIVATE FUNCTIONS */
 
 void GameHandler::generateLegalMoves()
@@ -48,18 +79,25 @@ void GameHandler::generateLegalMoves()
 
 					// forward moves, including double jump:
 					// if there is NOT a piece right infront of the pawn
-					if (((all_piece_map_ << position + team * 8) & OCCUPIED) == 0)
+					if (!isPieceAtPosition(position + 8 * team))
 					{
 						all_legal_moves_[position] |= OCCUPIED >> position + team * 8;
 
 						// same thing but for double jump; checks if it's in starting square && if it can double jump:
-						if (position / 8 == 3.5 - 2.5 * team && ((all_piece_map_ << position + team * 16) & OCCUPIED) == 0)
+						if (position / 8 == 3.5 - 2.5 * team && !isPieceAtPosition(position + 16 * team))
 							all_legal_moves_[position] |= OCCUPIED >> position + team * 16;
 					}
 
 					// captures
+					// normal captures:
+					if (position % 8 != 7 && isEnemyAtPosition(position + team * 8 + 1, team))
+						all_legal_moves_[position] |= OCCUPIED >> position + team * 8 + 1;
+					if (position % 8 != 0 && isEnemyAtPosition(position + team * 8 - 1, team))
+						all_legal_moves_[position] |= OCCUPIED >> position + team * 8 - 1;
+
+					// en passants:
 				}
-				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if it's empty (& we're looking at white moves), set it 
+				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 				{
 					all_legal_moves_[position] = EMPTY;
 				}
@@ -103,4 +141,20 @@ void GameHandler::generateLegalMoves()
 		}
 		}
 	}
+}
+
+bool GameHandler::isPieceAtPosition(int position)
+{
+	if (((all_piece_map_ << position) & OCCUPIED) == 0)
+		return false;
+	return true;
+}
+
+bool GameHandler::isEnemyAtPosition(int position, int your_team)
+{
+	if (your_team == WHITE && ((black_piece_map_ << position) & OCCUPIED) == 0)
+		return false;
+	else if (your_team == BLACK && ((white_piece_map_ << position) & OCCUPIED) == 0)
+		return false;
+	return true;
 }

@@ -47,6 +47,7 @@ private:
 		for (int i = 0; i < 12; ++i)
 			pieces_[i] = nullptr;
 		is_running_ = false;
+		highlighted_squares_ = 0;
 		init();
 	}
 
@@ -54,8 +55,10 @@ private:
 	void renderBoard();
 	void renderMap(uint64_t map, SDL_Texture* const piece);
 	void init();
+	void handleUserInput(int team, SDL_Event& event);
 
 	bool is_running_;
+	uint64_t highlighted_squares_;
 
 	SDL_Renderer* renderer_;
 	SDL_Window* window_;

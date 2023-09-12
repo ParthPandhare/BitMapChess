@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <bitset>
+#include "SDL.h"
 #include "constants.h"
 
 class GameHandler
@@ -26,12 +27,15 @@ public:
 		}
 	}
 
-	void displayBoard();
-	void displayPiece(int piece);
+	void displayBoard();			// for debugging; prints out team bitmaps
+	void displayPiece(int piece);	// for debugging; prints out piece bitmaps
+	void displayMap(uint64_t map);	// for debugging; prints out a given map
+
 	uint64_t* getPositions() { return pieces_; }
-	uint64_t getHighlights() { return highlights_; }
 	uint64_t* getAllLegalMoves() { return all_legal_moves_; }
-	void displayMap(uint64_t map);
+	uint64_t getTeamMap(int team) { if (team == WHITE) return white_piece_map_; return black_piece_map_; }
+
+	void move(int team, int start_pos, int end_pos);
 
 
 private:
@@ -41,7 +45,6 @@ private:
 		all_piece_map_ = 0xFFFF00000000FFFF;
 		white_piece_map_ = 0x000000000000FFFF;
 		black_piece_map_ = 0xFFFF000000000000;
-		highlights_ = 0x00;
 		pieces_[pieces::B_BISHOP] = 0x2400000000000000;
 		pieces_[pieces::B_KNIGHT] = 0x4200000000000000;
 		pieces_[pieces::B_ROOK] = 0x8100000000000000;
@@ -61,6 +64,8 @@ private:
 	}
 
 	void generateLegalMoves();		// populates all_legal_moves_ with the current maps
+	bool isPieceAtPosition(int position);
+	bool isEnemyAtPosition(int position, int your_team);
 
 	/*
 	- piece_map_ is a bitmap storing the positions of all existing pieces on the board (1 if there is a piece, 0 otherwise)
@@ -68,7 +73,7 @@ private:
 	- all legal moves shows the possible positions a piece (if it exists) at a certain position can go to. If a square is empty, it's filled with all 1s
 	*/
 
-	uint64_t white_piece_map_, black_piece_map_, all_piece_map_, highlights_;
+	uint64_t white_piece_map_, black_piece_map_, all_piece_map_;
 	uint64_t pieces_[12];
 	uint64_t all_legal_moves_[64];
 };
