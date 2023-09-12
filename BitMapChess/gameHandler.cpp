@@ -138,7 +138,18 @@ void GameHandler::generateLegalMoves()
 			team = BLACK;
 		case pieces::W_KNIGHT:
 		{
-
+			for (int position = 0; position < 64; ++position)
+			{
+				if (((pieces_[i] << position) & OCCUPIED) != 0)
+				{
+					all_legal_moves_[position] = 0;
+					generateKnightMoves(position, team);
+				}
+				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+				{
+					all_legal_moves_[position] = EMPTY;
+				}
+			}
 			break;
 		}
 		case pieces::B_ROOK:
@@ -380,5 +391,88 @@ void GameHandler::generateStraightMoves(int position, int team)
 			break;
 		}
 		else break;
+	}
+}
+
+void GameHandler::generateKnightMoves(int position, int team)
+{
+	// knight move generation: brute forces each position after checking bounds
+	int x_pos = position % 8;
+	int y_pos = position / 8;
+
+	// bottom right square moves
+	if (x_pos <= 5 && y_pos <= 5)
+	{
+		if (!isPieceAtPosition(position + 10) || isEnemyAtPosition(position + 10, team))
+			all_legal_moves_[position] |= OCCUPIED >> position + 10;
+		if (!isPieceAtPosition(position + 17) || isEnemyAtPosition(position + 17, team))
+			all_legal_moves_[position] |= OCCUPIED >> position + 17;
+	}
+	else if (x_pos <= 5 && y_pos == 6)
+	{
+		if (!isPieceAtPosition(position + 10) || isEnemyAtPosition(position + 10, team))
+			all_legal_moves_[position] |= OCCUPIED >> position + 10;
+	}
+	else if (y_pos <= 5 && x_pos == 6)
+	{
+		if (!isPieceAtPosition(position + 17) || isEnemyAtPosition(position + 17, team))
+			all_legal_moves_[position] |= OCCUPIED >> position + 17;
+	}
+
+	// bottom left square moves
+	if (x_pos >= 2 && y_pos <= 5)
+	{
+		if (!isPieceAtPosition(position + 6) || isEnemyAtPosition(position + 6, team))
+			all_legal_moves_[position] |= OCCUPIED >> position + 6;
+		if (!isPieceAtPosition(position + 15) || isEnemyAtPosition(position + 15, team))
+			all_legal_moves_[position] |= OCCUPIED >> position + 15;
+	}
+	else if (x_pos >= 2 && y_pos == 6)
+	{
+		if (!isPieceAtPosition(position + 6) || isEnemyAtPosition(position + 6, team))
+			all_legal_moves_[position] |= OCCUPIED >> position + 6;
+	}
+	else if (y_pos <= 5 && x_pos == 1)
+	{
+		if (!isPieceAtPosition(position + 15) || isEnemyAtPosition(position + 15, team))
+			all_legal_moves_[position] |= OCCUPIED >> position + 15;
+	}
+
+	// top right square moves
+	if (x_pos <= 5 && y_pos >= 2)
+	{
+		if (!isPieceAtPosition(position - 6) || isEnemyAtPosition(position - 6, team))
+			all_legal_moves_[position] |= OCCUPIED >> position - 6;
+		if (!isPieceAtPosition(position - 15) || isEnemyAtPosition(position - 15, team))
+			all_legal_moves_[position] |= OCCUPIED >> position - 15;
+	}
+	else if (x_pos <= 5 && y_pos == 1)
+	{
+		if (!isPieceAtPosition(position - 6) || isEnemyAtPosition(position - 6, team))
+			all_legal_moves_[position] |= OCCUPIED >> position - 6;
+	}
+	else if (y_pos >= 2 && x_pos == 6)
+	{
+		if (!isPieceAtPosition(position - 15) || isEnemyAtPosition(position - 15, team))
+			all_legal_moves_[position] |= OCCUPIED >> position - 15;
+	}
+
+	// top left square moves
+	if (x_pos >= 2 && y_pos >= 2)
+	{
+		if (!isPieceAtPosition(position - 10) || isEnemyAtPosition(position - 10, team))
+			all_legal_moves_[position] |= OCCUPIED >> position - 10;
+		if (!isPieceAtPosition(position - 17) || isEnemyAtPosition(position - 17, team))
+			all_legal_moves_[position] |= OCCUPIED >> position - 17;
+	}
+	else if (x_pos >= 2 && y_pos == 1)
+	{
+		if (!isPieceAtPosition(position - 10) || isEnemyAtPosition(position - 10, team))
+			all_legal_moves_[position] |= OCCUPIED >> position - 10;
+	}
+	else if (y_pos >= 2 && x_pos == 1)
+	{
+		if (!isPieceAtPosition(position - 17) || isEnemyAtPosition(position - 17, team))
+			all_legal_moves_[position] |= OCCUPIED >> position - 17;
 	}
 }
