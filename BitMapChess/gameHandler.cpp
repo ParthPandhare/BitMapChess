@@ -249,37 +249,7 @@ void GameHandler::generateLegalMoves()
 		}
 	}
 
-	// black king moves:
-	for (int position = 0; position < 64; ++position)
-	{
-		if (((pieces_[pieces::B_KING] << position) & OCCUPIED) != 0)
-		{
-			all_legal_moves_[position] = 0;
-			generateKingMoves(position, team);
-			break;
-		}
-		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
-		{
-			all_legal_moves_[position] = EMPTY;
-		}
-	}
-
-	team = WHITE;
-
-	// white king moves:
-	for (int position = 0; position < 64; ++position)
-	{
-		if (((pieces_[pieces::W_KING] << position) & OCCUPIED) != 0)
-		{
-			all_legal_moves_[position] = 0;
-			generateKingMoves(position, team);
-			break;
-		}
-		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
-		{
-			all_legal_moves_[position] = EMPTY;
-		}
-	}
+	generateKingMoves();
 }
 
 bool GameHandler::isPieceAtPosition(int position)
@@ -633,6 +603,43 @@ void GameHandler::generateKingMoves(int position, int team)
 	}
 }
 
+void GameHandler::generateKingMoves()
+{
+	int team = BLACK;
+
+	// black king moves:
+	for (int position = 0; position < 64; ++position)
+	{
+		if (((pieces_[pieces::B_KING] << position) & OCCUPIED) != 0)
+		{
+			all_legal_moves_[position] = 0;
+			generateKingMoves(position, team);
+			break;
+		}
+		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+		{
+			all_legal_moves_[position] = EMPTY;
+		}
+	}
+
+	team = WHITE;
+
+	// white king moves:
+	for (int position = 0; position < 64; ++position)
+	{
+		if (((pieces_[pieces::W_KING] << position) & OCCUPIED) != 0)
+		{
+			all_legal_moves_[position] = 0;
+			generateKingMoves(position, team);
+			break;
+		}
+		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+		{
+			all_legal_moves_[position] = EMPTY;
+		}
+	}
+}
+
 void GameHandler::generatePawnMoves(int position, int team)
 {
 	// forward moves, including double jump:
@@ -667,18 +674,25 @@ void GameHandler::generatePawnMoves(int position, int team)
 	}
 }
 
-bool GameHandler::isCheck(int position, int team)
+uint64_t GameHandler::getEnemyChecks(int team)
 {
 	uint64_t enemy_board;
 	team == WHITE ? enemy_board = white_piece_map_ : enemy_board = black_piece_map_;
+	
+	uint64_t enemy_checks = 0x00;
 
-	// iterate through enemy piece map, for each enemy piece, check the corresponding moves on all_legal_moves_ to see if position is in check
-	for (int enemy_position = 0; enemy_position < 64; ++enemy_position)
+	for (int position = 0; position < 64; ++position)
 	{
-		if (isEnemyAtPosition(enemy_position, team) && ((all_legal_moves_[enemy_position] << position) & OCCUPIED) != 0)
+		if (((enemy_board << position) & OCCUPIED) != 0)
 		{
-			return true;
+			enemy_checks |= all_legal_moves_[position];
 		}
 	}
-	return false;
+	
+	return enemy_checks;
+}
+
+bool GameHandler::isCheck(int position, int team)
+{
+	return (OCCUPIED >> position) & getEnemyChecks(team);
 }

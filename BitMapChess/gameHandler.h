@@ -78,7 +78,9 @@ private:
 	void generateStraightMoves(int position, int team);
 	void generateKnightMoves(int position, int team);
 	void generateKingMoves(int position, int team);
+	void generateKingMoves();
 	void generatePawnMoves(int position, int team);
+	uint64_t getEnemyChecks(int team);
 	bool isCheck(int position, int team);
 	void deleteAllIllegalMoves();
 
