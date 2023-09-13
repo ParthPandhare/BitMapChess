@@ -293,6 +293,8 @@ void GameHandler::generateDiagonalMoves(int position, int team)
 
 			if ((position + x_incr) % 8 == 7)
 				break;
+			if ((position + 8 * y_incr) / 8 == 7)
+				break;
 
 			x_incr++;
 			y_incr++;
@@ -317,6 +319,8 @@ void GameHandler::generateDiagonalMoves(int position, int team)
 					break;
 
 				if ((position + x_incr) % 8 == 7)
+					break;
+				if ((position - 8 * y_incr) / 8 == 0)
 					break;
 
 				x_incr++;
@@ -347,6 +351,8 @@ void GameHandler::generateDiagonalMoves(int position, int team)
 
 			if ((position - x_incr) % 8 == 0)
 				break;
+			if ((position + 8 * y_incr) / 8 == 7)
+				break;
 
 			x_incr++;
 			y_incr++;
@@ -371,6 +377,8 @@ void GameHandler::generateDiagonalMoves(int position, int team)
 					break;
 
 				if ((position - x_incr) % 8 == 0)
+					break;
+				if ((position - 8 * y_incr) / 8 == 0)
 					break;
 
 				x_incr++;
