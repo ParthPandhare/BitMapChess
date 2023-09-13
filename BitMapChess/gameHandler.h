@@ -37,6 +37,7 @@ public:
 
 	bool move(int team, int start_pos, int end_pos);		// true if a pawn is promoting, false otherwise
 	void promote(int position, int piece, int team);
+	int getTurn() { return turn_; }
 
 
 private:
@@ -60,6 +61,8 @@ private:
 		pieces_[pieces::W_PAWN] = 0x000000000000FF00;
 		for (int i = 0; i < 64; ++i)
 			all_legal_moves_[i] = 0x00;
+		en_passantable_piece_ = -1;
+		turn_ = WHITE;
 
 		generateLegalMoves();
 	}
@@ -82,6 +85,9 @@ private:
 	uint64_t white_piece_map_, black_piece_map_, all_piece_map_;
 	uint64_t pieces_[12];
 	uint64_t all_legal_moves_[64];
+
+	int en_passantable_piece_;		// -1 if none of the pieces can be en-passanted; represents the position of the piece that can be en passanted
+	int turn_;
 };
 
 #endif // !GAME_HANDLER_H

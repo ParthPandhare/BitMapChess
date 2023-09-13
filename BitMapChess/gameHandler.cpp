@@ -24,20 +24,32 @@ void GameHandler::displayMap(uint64_t map)
 
 bool GameHandler::move(int team, int start_pos, int end_pos)
 {
-	// move the piece on the piece maps
+	// move the piece on the piece maps && deletes the captured piece, if any, on that piece's map
+	int moved_piece;
 	for (int i = 0; i < 12; ++i)
 	{
 		if ((pieces_[i] & OCCUPIED >> start_pos) != 0)
 		{
 			pieces_[i] ^= OCCUPIED >> start_pos;
 			pieces_[i] ^= OCCUPIED >> end_pos;
+			moved_piece = i;
 		}
 		else if ((pieces_[i] & OCCUPIED >> end_pos) != 0)
 		{
 			pieces_[i] &= ~(OCCUPIED >> end_pos);
 		}
-
-		// en passants
+	}
+	// en passant captures on piece maps
+	// if the moved piece is a pawn, it moved diagonally, and there's nothing on the end_pos in the other team's map, en passant
+	if (moved_piece == pieces::W_PAWN && end_pos % 8 != start_pos % 8 && ((black_piece_map_ >> end_pos) & OCCUPIED) == 0)
+	{
+		black_piece_map_ &= ~(OCCUPIED >> end_pos + 8);
+		pieces_[pieces::B_PAWN] &= ~(OCCUPIED >> end_pos + 8);
+	}
+	else if (moved_piece == pieces::B_PAWN && end_pos % 8 != start_pos % 8 && ((white_piece_map_ >> end_pos) & OCCUPIED) == 0)
+	{
+		white_piece_map_ &= ~(OCCUPIED >> end_pos - 8);
+		pieces_[pieces::W_PAWN] &= ~(OCCUPIED >> end_pos - 8);
 	}
 
 	// move the piece on the team maps
@@ -47,8 +59,6 @@ bool GameHandler::move(int team, int start_pos, int end_pos)
 		white_piece_map_ ^= OCCUPIED >> end_pos;
 		
 		black_piece_map_ &= ~(OCCUPIED >> end_pos);		// handles normal captures 
-
-		// if it's an en-passant 
 	}
 	else if (team == BLACK)
 	{
@@ -56,8 +66,6 @@ bool GameHandler::move(int team, int start_pos, int end_pos)
 		black_piece_map_ ^= OCCUPIED >> end_pos;
 
 		white_piece_map_ &= ~(OCCUPIED >> end_pos);		// handles normal captures 
-
-		// if it's an en-passant 
 	}
 
 	all_piece_map_ = white_piece_map_ | black_piece_map_;
@@ -68,7 +76,12 @@ bool GameHandler::move(int team, int start_pos, int end_pos)
 		(team == BLACK && end_pos / 8 == 7 && ((pieces_[pieces::B_PAWN] << end_pos) & OCCUPIED) != 0))
 		promoting = true;
 
+	// setting en passants for the next move
+	if ((moved_piece == pieces::W_PAWN && start_pos / 8 - end_pos / 8 == 2) || (moved_piece == pieces::B_PAWN && start_pos / 8 - end_pos / 8 == -2))
+		en_passantable_piece_ = end_pos;
+
 	generateLegalMoves();
+	turn_ *= -1;
 	return promoting;
 }
 
@@ -570,4 +583,15 @@ void GameHandler::generatePawnMoves(int position, int team)
 		all_legal_moves_[position] |= OCCUPIED >> position + team * 8 - 1;
 
 	// en passants:
+	if (en_passantable_piece_ != -1 && position / 8 == 3.5 + 0.5 * team)
+	{
+		if (position + 1 == en_passantable_piece_)	// if there is an en-passantable pawn to the right
+		{
+			all_legal_moves_[position] |= OCCUPIED >> position + team * 8 + 1;
+		}
+		else if (position - 1 == en_passantable_piece_)		// if there's an en-passantable pawn to the left
+		{
+			all_legal_moves_[position] |= OCCUPIED >> position + team * 8 - 1;
+		}
+	}
 }

@@ -36,7 +36,7 @@ void Renderer::handleEvents()
 	if (event.type == SDL_QUIT)
 		is_running_ = false;
 	else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
-		handleUserInput(turn_, event);
+		handleUserInput(game->getTurn(), event);
 }
 
 void Renderer::render()
@@ -139,15 +139,15 @@ void Renderer::renderPromotion()
 
 	SDL_Rect dest_Rect;
 	dest_Rect.x = (promoting_.second % 8) * constants::SQUARE_DIMENSION;
-	dest_Rect.y = (promoting_.second / 8 - 3 * turn_) * constants::SQUARE_DIMENSION;
+	dest_Rect.y = (promoting_.second / 8 + 3 * game->getTurn()) * constants::SQUARE_DIMENSION;
 	dest_Rect.h = constants::SQUARE_DIMENSION;
 	dest_Rect.w = constants::SQUARE_DIMENSION;
 
 	for (int i = 0; i < 4; ++i)
 	{
 		SDL_RenderCopy(renderer_, promotion_, NULL, &dest_Rect);
-		SDL_RenderCopy(renderer_, pieces_[3 + i - 3 * turn_], NULL, &dest_Rect);
-		dest_Rect.y += turn_ * constants::SQUARE_DIMENSION;
+		SDL_RenderCopy(renderer_, pieces_[3 + i + 3 * game->getTurn()], NULL, &dest_Rect);
+		dest_Rect.y += -1 * game->getTurn() * constants::SQUARE_DIMENSION;
 	}
 }
 
@@ -212,52 +212,53 @@ void Renderer::handlePromotion()
 			return;
 		}
 
+		int team_promoting = game->getTurn() * -1;
 		if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT && event.button.x / constants::SQUARE_DIMENSION == promoting_.second % 8)
 		{
 			int y_clicked = event.button.y / constants::SQUARE_DIMENSION;
-			if (turn_ == WHITE)
+			if (team_promoting == WHITE)
 			{
 				if (y_clicked == 0)
 				{
-					game->promote(promoting_.second, pieces::W_QUEEN, turn_);
+					game->promote(promoting_.second, pieces::W_QUEEN, team_promoting);
 					break;
 				}
 				else if (y_clicked == 1)
 				{
-					game->promote(promoting_.second, pieces::W_BISHOP, turn_);
+					game->promote(promoting_.second, pieces::W_BISHOP, team_promoting);
 					break;
 				}
 				else if (y_clicked == 2)
 				{
-					game->promote(promoting_.second, pieces::W_KNIGHT, turn_);
+					game->promote(promoting_.second, pieces::W_KNIGHT, team_promoting);
 					break;
 				}
 				else if (y_clicked == 3)
 				{
-					game->promote(promoting_.second, pieces::W_ROOK, turn_);
+					game->promote(promoting_.second, pieces::W_ROOK, team_promoting);
 					break;
 				}
 			}
-			else if (turn_ == BLACK)
+			else if (team_promoting == BLACK)
 			{
 				if (y_clicked == 7)
 				{
-					game->promote(promoting_.second, pieces::B_QUEEN, turn_);
+					game->promote(promoting_.second, pieces::B_QUEEN, team_promoting);
 					break;
 				}
 				else if (y_clicked == 6)
 				{
-					game->promote(promoting_.second, pieces::B_BISHOP, turn_);
+					game->promote(promoting_.second, pieces::B_BISHOP, team_promoting);
 					break;
 				}
 				else if (y_clicked == 5)
 				{
-					game->promote(promoting_.second, pieces::B_KNIGHT, turn_);
+					game->promote(promoting_.second, pieces::B_KNIGHT, team_promoting);
 					break;
 				}
 				else if (y_clicked == 4)
 				{
-					game->promote(promoting_.second, pieces::B_ROOK, turn_);
+					game->promote(promoting_.second, pieces::B_ROOK, team_promoting);
 					break;
 				}
 			}

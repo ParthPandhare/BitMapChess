@@ -49,7 +49,6 @@ private:
 			pieces_[i] = nullptr;
 		is_running_ = false;
 		highlighted_squares_ = 0;
-		turn_ = WHITE;
 		init();
 	}
 
@@ -64,7 +63,6 @@ private:
 	bool is_running_;
 	std::pair<bool, int> promoting_;
 	uint64_t highlighted_squares_;
-	int turn_;
 
 	SDL_Renderer* renderer_;
 	SDL_Window* window_;
