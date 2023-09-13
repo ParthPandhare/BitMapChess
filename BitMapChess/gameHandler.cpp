@@ -101,126 +101,183 @@ void GameHandler::promote(int position, int piece, int team)
 
 void GameHandler::generateLegalMoves()
 {
-	for (int i = 0; i < 12; ++i)
+	int team = WHITE;
+
+	// white pawn moves:
+	for (int position = 0; position < 64; ++position)
 	{
-		int team = WHITE;
-		switch (i)
+		if (((pieces_[pieces::W_PAWN] << position) & OCCUPIED) != 0)
 		{
-		case pieces::B_PAWN:
-			team = BLACK;
-		case pieces::W_PAWN:
+			// resets previous moves
+			all_legal_moves_[position] = 0;
+			generatePawnMoves(position, team);
+		}
+		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			// iterates through pawn_map & finds all the pawns; for every pawn, it generates the moves & adds them to all_legal_moves_
-			for (int position = 0; position < 64; ++position)
-			{
-				if (((pieces_[i] << position) & OCCUPIED) != 0)
-				{
-					// resets previous moves
-					all_legal_moves_[position] = 0;
-					generatePawnMoves(position, team);
-				}
-				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
-				{
-					all_legal_moves_[position] = EMPTY;
-				}
-			}
+			all_legal_moves_[position] = EMPTY;
+		}
+	}
+
+	// white bishop moves:
+	for (int position = 0; position < 64; ++position)
+	{
+		if (((pieces_[pieces::W_BISHOP] << position) & OCCUPIED) != 0)
+		{
+			all_legal_moves_[position] = 0;
+			generateDiagonalMoves(position, team);
+		}
+		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+		{
+			all_legal_moves_[position] = EMPTY;
+		}
+	}
+
+	// white knight moves:
+	for (int position = 0; position < 64; ++position)
+	{
+		if (((pieces_[pieces::W_KNIGHT] << position) & OCCUPIED) != 0)
+		{
+			all_legal_moves_[position] = 0;
+			generateKnightMoves(position, team);
+		}
+		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+		{
+			all_legal_moves_[position] = EMPTY;
+		}
+	}
+
+	// white rook moves:
+	for (int position = 0; position < 64; ++position)
+	{
+		if (((pieces_[pieces::W_ROOK] << position) & OCCUPIED) != 0)
+		{
+			all_legal_moves_[position] = 0;
+			generateStraightMoves(position, team);
+		}
+		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+		{
+			all_legal_moves_[position] = EMPTY;
+		}
+	}
+
+	// white queen moves:
+	for (int position = 0; position < 64; ++position)
+	{
+		if (((pieces_[pieces::W_QUEEN] << position) & OCCUPIED) != 0)
+		{
+			all_legal_moves_[position] = 0;
+			generateStraightMoves(position, team);
+			generateDiagonalMoves(position, team);
+		}
+		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+		{
+			all_legal_moves_[position] = EMPTY;
+		}
+	}
+
+	team = BLACK;
+
+	// black pawn moves:
+	for (int position = 0; position < 64; ++position)
+	{
+		if (((pieces_[pieces::B_PAWN] << position) & OCCUPIED) != 0)
+		{
+			// resets previous moves
+			all_legal_moves_[position] = 0;
+			generatePawnMoves(position, team);
+		}
+		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+		{
+			all_legal_moves_[position] = EMPTY;
+		}
+	}
+
+	// black bishop moves:
+	for (int position = 0; position < 64; ++position)
+	{
+		if (((pieces_[pieces::B_BISHOP] << position) & OCCUPIED) != 0)
+		{
+			all_legal_moves_[position] = 0;
+			generateDiagonalMoves(position, team);
+		}
+		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+		{
+			all_legal_moves_[position] = EMPTY;
+		}
+	}
+
+	// black knight moves:
+	for (int position = 0; position < 64; ++position)
+	{
+		if (((pieces_[pieces::B_KNIGHT] << position) & OCCUPIED) != 0)
+		{
+			all_legal_moves_[position] = 0;
+			generateKnightMoves(position, team);
+		}
+		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+		{
+			all_legal_moves_[position] = EMPTY;
+		}
+	}
+
+	// black rook moves:
+	for (int position = 0; position < 64; ++position)
+	{
+		if (((pieces_[pieces::B_ROOK] << position) & OCCUPIED) != 0)
+		{
+			all_legal_moves_[position] = 0;
+			generateStraightMoves(position, team);
+		}
+		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+		{
+			all_legal_moves_[position] = EMPTY;
+		}
+	}
+
+	// black queen moves:
+	for (int position = 0; position < 64; ++position)
+	{
+		if (((pieces_[pieces::B_QUEEN] << position) & OCCUPIED) != 0)
+		{
+			all_legal_moves_[position] = 0;
+			generateStraightMoves(position, team);
+			generateDiagonalMoves(position, team);
+		}
+		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
+		{
+			all_legal_moves_[position] = EMPTY;
+		}
+	}
+
+	// black king moves:
+	for (int position = 0; position < 64; ++position)
+	{
+		if (((pieces_[pieces::B_KING] << position) & OCCUPIED) != 0)
+		{
+			all_legal_moves_[position] = 0;
+			generateKingMoves(position, team);
 			break;
 		}
-		case pieces::B_BISHOP:
-			team = BLACK;
-		case pieces::W_BISHOP:
+		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			// iterates through bishop map, finds all bishops, and generates the legal moves for each piece
-			for (int position = 0; position < 64; ++position)
-			{
-				if (((pieces_[i] << position) & OCCUPIED) != 0)
-				{
-					all_legal_moves_[position] = 0;
-					generateDiagonalMoves(position, team);
-				}
-				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
-				{
-					all_legal_moves_[position] = EMPTY;
-				}
-			}
+			all_legal_moves_[position] = EMPTY;
+		}
+	}
+
+	team = WHITE;
+
+	// white king moves:
+	for (int position = 0; position < 64; ++position)
+	{
+		if (((pieces_[pieces::W_KING] << position) & OCCUPIED) != 0)
+		{
+			all_legal_moves_[position] = 0;
+			generateKingMoves(position, team);
 			break;
 		}
-		case pieces::B_KNIGHT:
-			team = BLACK;
-		case pieces::W_KNIGHT:
+		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			for (int position = 0; position < 64; ++position)
-			{
-				if (((pieces_[i] << position) & OCCUPIED) != 0)
-				{
-					all_legal_moves_[position] = 0;
-					generateKnightMoves(position, team);
-				}
-				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
-				{
-					all_legal_moves_[position] = EMPTY;
-				}
-			}
-			break;
-		}
-		case pieces::B_ROOK:
-			team = BLACK;
-		case pieces::W_ROOK:
-		{
-			// iteratres through rook maps, finds all rooks, & generates the legal moves for each piece
-			for (int position = 0; position < 64; ++position)
-			{
-				if (((pieces_[i] << position) & OCCUPIED) != 0)
-				{
-					all_legal_moves_[position] = 0;
-					generateStraightMoves(position, team);
-				}
-				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
-				{
-					all_legal_moves_[position] = EMPTY;
-				}
-			}
-			break;
-		}
-		case pieces::B_QUEEN:
-			team = BLACK;
-		case pieces::W_QUEEN:
-		{
-			// same as rook & bishop, but combined
-			for (int position = 0; position < 64; ++position)
-			{
-				if (((pieces_[i] << position) & OCCUPIED) != 0)
-				{
-					all_legal_moves_[position] = 0;
-					generateStraightMoves(position, team);
-					generateDiagonalMoves(position, team);
-				}
-				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
-				{
-					all_legal_moves_[position] = EMPTY;
-				}
-			}
-			break;
-		}
-		case pieces::B_KING:
-			team = BLACK;
-		case pieces::W_KING:
-		{
-			for (int position = 0; position < 64; ++position)
-			{
-				if (((pieces_[i] << position) & OCCUPIED) != 0)
-				{
-					all_legal_moves_[position] = 0;
-					generateKingMoves(position, team);
-					break;
-				}
-				else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
-				{
-					all_legal_moves_[position] = EMPTY;
-				}
-			}
-			break;
-		}
+			all_legal_moves_[position] = EMPTY;
 		}
 	}
 }
@@ -560,6 +617,20 @@ void GameHandler::generateKingMoves(int position, int team)
 		if (!isPieceAtPosition(position + 7) || isEnemyAtPosition(position + 7, team))
 			all_legal_moves_[position] |= OCCUPIED >> position + 7;
 	}
+
+	// kingside castling
+	if ((team == WHITE && w_ksc_ == true || team == BLACK && b_ksc_ == true) && !isPieceAtPosition(position + 1) && !isPieceAtPosition(position + 2) && 
+		!isCheck(position + 1, team) && !isCheck(position + 2, team))
+	{
+		all_legal_moves_[position] |= OCCUPIED >> position + 2;
+	}
+
+	// queenside castling
+	if ((team == WHITE && w_qsc_ == true || team == BLACK && b_qsc_ == true) && !isPieceAtPosition(position - 1) && !isPieceAtPosition(position - 2) &&
+		!isCheck(position - 1, team) && !isCheck(position - 2, team))
+	{
+		all_legal_moves_[position] |= OCCUPIED >> position - 2;
+	}
 }
 
 void GameHandler::generatePawnMoves(int position, int team)
@@ -594,4 +665,20 @@ void GameHandler::generatePawnMoves(int position, int team)
 			all_legal_moves_[position] |= OCCUPIED >> position + team * 8 - 1;
 		}
 	}
+}
+
+bool GameHandler::isCheck(int position, int team)
+{
+	uint64_t enemy_board;
+	team == WHITE ? enemy_board = white_piece_map_ : enemy_board = black_piece_map_;
+
+	// iterate through enemy piece map, for each enemy piece, check the corresponding moves on all_legal_moves_ to see if position is in check
+	for (int enemy_position = 0; enemy_position < 64; ++enemy_position)
+	{
+		if (isEnemyAtPosition(enemy_position, team) && ((all_legal_moves_[enemy_position] << position) & OCCUPIED) != 0)
+		{
+			return true;
+		}
+	}
+	return false;
 }

@@ -63,6 +63,10 @@ private:
 			all_legal_moves_[i] = 0x00;
 		en_passantable_piece_ = -1;
 		turn_ = WHITE;
+		w_ksc_ = true;
+		w_qsc_ = true;
+		b_ksc_ = true;
+		b_qsc_ = true;
 
 		generateLegalMoves();
 	}
@@ -75,6 +79,8 @@ private:
 	void generateKnightMoves(int position, int team);
 	void generateKingMoves(int position, int team);
 	void generatePawnMoves(int position, int team);
+	bool isCheck(int position, int team);
+	void deleteAllIllegalMoves();
 
 	/*
 	- piece_map_ is a bitmap storing the positions of all existing pieces on the board (1 if there is a piece, 0 otherwise)
@@ -88,6 +94,7 @@ private:
 
 	int en_passantable_piece_;		// -1 if none of the pieces can be en-passanted; represents the position of the piece that can be en passanted
 	int turn_;
+	bool w_ksc_, w_qsc_, b_ksc_, b_qsc_;	// determine if the kings can castle
 };
 
 #endif // !GAME_HANDLER_H
