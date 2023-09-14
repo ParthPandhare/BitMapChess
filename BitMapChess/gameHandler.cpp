@@ -250,6 +250,10 @@ void GameHandler::generateLegalMoves()
 	}
 
 	generateKingMoves();
+	std::cout << "Black checks: " << std::endl;
+	displayMap(getEnemyChecks(WHITE));
+	std::cout << "White checks: " << std::endl;
+	displayMap(getEnemyChecks(BLACK));
 }
 
 bool GameHandler::isPieceAtPosition(int position)
@@ -682,10 +686,21 @@ void GameHandler::generatePawnMoves(int position, int team)
 	}
 }
 
+uint64_t GameHandler::generatePawnAttacks(int position, int team)
+{
+	uint64_t attacks = 0;
+	if (position % 8 != 7)
+		attacks |= OCCUPIED >> position + team * 8 + 1;
+	if (position % 8 != 0)
+		attacks |= OCCUPIED >> position + team * 8 - 1;
+	return attacks;
+}
+
 uint64_t GameHandler::getEnemyChecks(int team)
 {
-	uint64_t enemy_board;
-	team == WHITE ? enemy_board = white_piece_map_ : enemy_board = black_piece_map_;
+	uint64_t enemy_board, enemy_pawns;
+	team == WHITE ? enemy_board = black_piece_map_ : enemy_board = white_piece_map_;
+	team == WHITE ? enemy_pawns = pieces_[pieces::B_PAWN] : enemy_pawns = pieces_[pieces::W_PAWN];
 	
 	uint64_t enemy_checks = 0x00;
 
@@ -693,7 +708,10 @@ uint64_t GameHandler::getEnemyChecks(int team)
 	{
 		if (((enemy_board << position) & OCCUPIED) != 0)
 		{
-			enemy_checks |= all_legal_moves_[position];
+			if (((enemy_pawns << position) & OCCUPIED) == 0)
+				enemy_checks |= all_legal_moves_[position];
+			else
+				enemy_checks |= generatePawnAttacks(position, team * -1);
 		}
 	}
 	
