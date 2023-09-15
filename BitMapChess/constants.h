@@ -31,7 +31,6 @@ namespace pieces
 	const int W_PAWN = 11;
 }
 
-#define EMPTY 0xFFFFFFFFFFFFFFFF		// used for all legal moves map
 #define OCCUPIED 0x8000000000000000		// mask: 0b1000...0000 to check for pieces
 #define WHITE -1
 #define BLACK 1

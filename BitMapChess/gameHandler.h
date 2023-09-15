@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <bitset>
+#include <cassert>
 #include "SDL.h"
 #include "constants.h"
 

@@ -51,7 +51,8 @@ bool GameHandler::move(int team, int start_pos, int end_pos)
 		white_piece_map_ &= ~(OCCUPIED >> end_pos - 8);
 		pieces_[pieces::W_PAWN] &= ~(OCCUPIED >> end_pos - 8);
 	}
-
+	
+	// HERE
 	// move the piece on the team maps
 	if (team == WHITE)
 	{
@@ -69,6 +70,7 @@ bool GameHandler::move(int team, int start_pos, int end_pos)
 	}
 
 	// if a pawn is promoting
+	// HERE
 	bool promoting = false;
 	if ((team == WHITE && end_pos / 8 == 0 && ((pieces_[pieces::W_PAWN] << end_pos) & OCCUPIED) != 0) || 
 		(team == BLACK && end_pos / 8 == 7 && ((pieces_[pieces::B_PAWN] << end_pos) & OCCUPIED) != 0))
@@ -124,8 +126,8 @@ bool GameHandler::move(int team, int start_pos, int end_pos)
 
 	all_piece_map_ = white_piece_map_ | black_piece_map_;
 
-	generateLegalMoves();
 	turn_ *= -1;
+	generateLegalMoves();
 	return promoting;
 }
 
@@ -158,7 +160,7 @@ void GameHandler::generateLegalMoves()
 		}
 		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			all_legal_moves_[position] = EMPTY;
+			all_legal_moves_[position] = 0;
 		}
 	}
 
@@ -172,7 +174,7 @@ void GameHandler::generateLegalMoves()
 		}
 		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			all_legal_moves_[position] = EMPTY;
+			all_legal_moves_[position] = 0;
 		}
 	}
 
@@ -186,7 +188,7 @@ void GameHandler::generateLegalMoves()
 		}
 		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			all_legal_moves_[position] = EMPTY;
+			all_legal_moves_[position] = 0;
 		}
 	}
 
@@ -200,7 +202,7 @@ void GameHandler::generateLegalMoves()
 		}
 		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			all_legal_moves_[position] = EMPTY;
+			all_legal_moves_[position] = 0;
 		}
 	}
 
@@ -215,7 +217,7 @@ void GameHandler::generateLegalMoves()
 		}
 		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			all_legal_moves_[position] = EMPTY;
+			all_legal_moves_[position] = 0;
 		}
 	}
 
@@ -232,7 +234,7 @@ void GameHandler::generateLegalMoves()
 		}
 		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			all_legal_moves_[position] = EMPTY;
+			all_legal_moves_[position] = 0;
 		}
 	}
 
@@ -246,7 +248,7 @@ void GameHandler::generateLegalMoves()
 		}
 		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			all_legal_moves_[position] = EMPTY;
+			all_legal_moves_[position] = 0;
 		}
 	}
 
@@ -260,7 +262,7 @@ void GameHandler::generateLegalMoves()
 		}
 		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			all_legal_moves_[position] = EMPTY;
+			all_legal_moves_[position] = 0;
 		}
 	}
 
@@ -274,7 +276,7 @@ void GameHandler::generateLegalMoves()
 		}
 		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			all_legal_moves_[position] = EMPTY;
+			all_legal_moves_[position] = 0;
 		}
 	}
 
@@ -289,7 +291,7 @@ void GameHandler::generateLegalMoves()
 		}
 		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			all_legal_moves_[position] = EMPTY;
+			all_legal_moves_[position] = 0;
 		}
 	}
 
@@ -300,11 +302,11 @@ void GameHandler::generateLegalMoves()
 	std::cout << "White checks: " << std::endl;
 	displayMap(getEnemyChecks(BLACK));*/
 
-	std::cout << "White KSC: " << w_ksc_ << std::endl;
+	/*std::cout << "White KSC: " << w_ksc_ << std::endl;
 	std::cout << "White QSC: " << w_qsc_ << std::endl;
 	std::cout << "Black KSC: " << b_ksc_ << std::endl;
 	std::cout << "Black QSC: " << b_qsc_ << std::endl;
-	std::cout << "--------------" << std::endl;
+	std::cout << "--------------" << std::endl;*/
 }
 
 bool GameHandler::isPieceAtPosition(int position)
@@ -681,7 +683,7 @@ void GameHandler::generateKingMoves()
 		}
 		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			all_legal_moves_[position] = EMPTY;
+			all_legal_moves_[position] = 0;
 		}
 	}
 
@@ -698,7 +700,7 @@ void GameHandler::generateKingMoves()
 		}
 		else if (((all_piece_map_ << position) & OCCUPIED) == 0) 	// if the position is empty, set it to empty
 		{
-			all_legal_moves_[position] = EMPTY;
+			all_legal_moves_[position] = 0;
 		}
 	}
 }
@@ -765,7 +767,7 @@ uint64_t GameHandler::getEnemyChecks(int team)
 				enemy_checks |= generatePawnAttacks(position, team * -1);
 		}
 	}
-	
+
 	return enemy_checks;
 }
 
