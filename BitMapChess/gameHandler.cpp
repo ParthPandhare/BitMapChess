@@ -68,8 +68,6 @@ bool GameHandler::move(int team, int start_pos, int end_pos)
 		white_piece_map_ &= ~(OCCUPIED >> end_pos);		// handles normal captures 
 	}
 
-	all_piece_map_ = white_piece_map_ | black_piece_map_;
-
 	// if a pawn is promoting
 	bool promoting = false;
 	if ((team == WHITE && end_pos / 8 == 0 && ((pieces_[pieces::W_PAWN] << end_pos) & OCCUPIED) != 0) || 
@@ -79,6 +77,52 @@ bool GameHandler::move(int team, int start_pos, int end_pos)
 	// setting en passants for the next move
 	if ((moved_piece == pieces::W_PAWN && start_pos / 8 - end_pos / 8 == 2) || (moved_piece == pieces::B_PAWN && start_pos / 8 - end_pos / 8 == -2))
 		en_passantable_piece_ = end_pos;
+
+	// moves the rook if the king is castling && handles castling rights
+	if (team == WHITE)
+	{
+		if (moved_piece == pieces::W_KING && start_pos % 8 - end_pos % 8 == -2)
+		{
+			white_piece_map_ &= ~(OCCUPIED >> 63);
+			white_piece_map_ |= OCCUPIED >> 61;
+			pieces_[pieces::W_ROOK] &= ~(OCCUPIED >> 63);
+			pieces_[pieces::W_ROOK] |= OCCUPIED >> 61;
+		}
+		else if (moved_piece == pieces::W_KING && start_pos % 8 - end_pos % 8 == 2)
+		{
+			white_piece_map_ &= ~(OCCUPIED >> 56);
+			white_piece_map_ |= OCCUPIED >> 59;
+			pieces_[pieces::W_ROOK] &= ~(OCCUPIED >> 56);
+			pieces_[pieces::W_ROOK] |= OCCUPIED >> 59;
+		}
+		if (w_ksc_ && (moved_piece == pieces::W_KING || start_pos == 63 || end_pos == 63))
+			w_ksc_ = false;
+		if (w_qsc_ && (moved_piece == pieces::W_KING || start_pos == 56 || end_pos == 56))
+			w_qsc_ = false;
+	}
+	if (team == BLACK)
+	{
+		if (moved_piece == pieces::B_KING && start_pos % 8 - end_pos % 8 == -2)
+		{
+			black_piece_map_ &= ~(OCCUPIED >> 7);
+			black_piece_map_ |= OCCUPIED >> 5;
+			pieces_[pieces::B_ROOK] &= ~(OCCUPIED >> 7);
+			pieces_[pieces::B_ROOK] |= OCCUPIED >> 5;
+		}
+		else if (moved_piece == pieces::B_KING && start_pos % 8 - end_pos % 8 == 2)
+		{
+			black_piece_map_ &= ~(OCCUPIED >> 0);
+			black_piece_map_ |= OCCUPIED >> 3;
+			pieces_[pieces::B_ROOK] &= ~(OCCUPIED >> 0);
+			pieces_[pieces::B_ROOK] |= OCCUPIED >> 3;
+		}
+		if (b_ksc_ && (moved_piece == pieces::B_KING || start_pos == 7 || end_pos == 7))
+			b_ksc_ = false;
+		if (b_qsc_ && (moved_piece == pieces::B_KING || start_pos == 0 || end_pos == 0))
+			b_qsc_ = false;
+	}	
+
+	all_piece_map_ = white_piece_map_ | black_piece_map_;
 
 	generateLegalMoves();
 	turn_ *= -1;
@@ -250,10 +294,17 @@ void GameHandler::generateLegalMoves()
 	}
 
 	generateKingMoves();
-	std::cout << "Black checks: " << std::endl;
+
+	/*std::cout << "Black checks: " << std::endl;
 	displayMap(getEnemyChecks(WHITE));
 	std::cout << "White checks: " << std::endl;
-	displayMap(getEnemyChecks(BLACK));
+	displayMap(getEnemyChecks(BLACK));*/
+
+	std::cout << "White KSC: " << w_ksc_ << std::endl;
+	std::cout << "White QSC: " << w_qsc_ << std::endl;
+	std::cout << "Black KSC: " << b_ksc_ << std::endl;
+	std::cout << "Black QSC: " << b_qsc_ << std::endl;
+	std::cout << "--------------" << std::endl;
 }
 
 bool GameHandler::isPieceAtPosition(int position)
@@ -608,8 +659,8 @@ void GameHandler::generateKingMoves(int position, int team)
 	}
 
 	// queenside castling
-	if ((team == WHITE && w_qsc_ == true || team == BLACK && b_qsc_ == true) && !isPieceAtPosition(position - 1) && !isPieceAtPosition(position - 2) &&
-		!isCheck(position - 1, team) && !isCheck(position - 2, team))
+	if ((team == WHITE && w_qsc_ == true || team == BLACK && b_qsc_ == true) && !isPieceAtPosition(position - 1) && !isPieceAtPosition(position - 2) && 
+		!isPieceAtPosition(position - 3) && !isCheck(position - 1, team) && !isCheck(position - 2, team))
 	{
 		all_legal_moves_[position] |= OCCUPIED >> position - 2;
 	}
