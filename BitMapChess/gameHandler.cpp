@@ -41,15 +41,18 @@ bool GameHandler::move(int team, int start_pos, int end_pos)
 	}
 	// en passant captures on piece maps
 	// if the moved piece is a pawn, it moved diagonally, and there's nothing on the end_pos in the other team's map, en passant
-	if (moved_piece == pieces::W_PAWN && end_pos % 8 != start_pos % 8 && ((black_piece_map_ >> end_pos) & OCCUPIED) == 0)
+	if (en_passantable_piece_ != 0)
 	{
-		black_piece_map_ &= ~(OCCUPIED >> end_pos + 8);
-		pieces_[pieces::B_PAWN] &= ~(OCCUPIED >> end_pos + 8);
-	}
-	else if (moved_piece == pieces::B_PAWN && end_pos % 8 != start_pos % 8 && ((white_piece_map_ >> end_pos) & OCCUPIED) == 0)
-	{
-		white_piece_map_ &= ~(OCCUPIED >> end_pos - 8);
-		pieces_[pieces::W_PAWN] &= ~(OCCUPIED >> end_pos - 8);
+		if (moved_piece == pieces::W_PAWN && end_pos % 8 != start_pos % 8 && ((black_piece_map_ >> end_pos) & OCCUPIED) == 0)
+		{
+			black_piece_map_ &= ~(OCCUPIED >> end_pos + 8);
+			pieces_[pieces::B_PAWN] &= ~(OCCUPIED >> end_pos + 8);
+		}
+		else if (moved_piece == pieces::B_PAWN && end_pos % 8 != start_pos % 8 && ((white_piece_map_ >> end_pos) & OCCUPIED) == 0)
+		{
+			white_piece_map_ &= ~(OCCUPIED >> end_pos - 8);
+			pieces_[pieces::W_PAWN] &= ~(OCCUPIED >> end_pos - 8);
+		}
 	}
 	
 	// HERE
@@ -79,6 +82,8 @@ bool GameHandler::move(int team, int start_pos, int end_pos)
 	// setting en passants for the next move
 	if ((moved_piece == pieces::W_PAWN && start_pos / 8 - end_pos / 8 == 2) || (moved_piece == pieces::B_PAWN && start_pos / 8 - end_pos / 8 == -2))
 		en_passantable_piece_ = end_pos;
+	else
+		en_passantable_piece_ = 0;
 
 	// moves the rook if the king is castling && handles castling rights
 	if (team == WHITE)
@@ -296,6 +301,7 @@ void GameHandler::generateLegalMoves()
 	}
 
 	generateKingMoves();
+	deleteAllIllegalMoves();
 
 	/*std::cout << "Black checks: " << std::endl;
 	displayMap(getEnemyChecks(WHITE));
@@ -774,4 +780,71 @@ uint64_t GameHandler::getEnemyChecks(int team)
 bool GameHandler::isCheck(int position, int team)
 {
 	return (OCCUPIED >> position) & getEnemyChecks(team);
+}
+
+void GameHandler::deleteAllIllegalMoves()
+{
+	// white king
+	// double checks
+	int num_checks = 0;
+	for (int position = 0; position < 64; ++position)
+	{
+		if (((black_piece_map_ << position) & OCCUPIED) != 0)
+		{
+			if ((((pieces_[pieces::B_PAWN] << position) & OCCUPIED) == 0 && (pieces_[pieces::W_KING] & all_legal_moves_[position]) != 0) || 
+				(((pieces_[pieces::B_PAWN] << position) & OCCUPIED) != 0 && ((pieces_[pieces::W_KING] & generatePawnAttacks(position, BLACK)) != 0)))
+				num_checks++;
+				
+		}
+	}
+	if (num_checks >= 2)
+	{
+		for (int position = 0; position < 64; ++position)
+		{
+			if (((white_piece_map_ << position) & OCCUPIED) != 0 && (pieces_[pieces::W_KING] & (OCCUPIED >> position)) == 0)
+			{
+				all_legal_moves_[position] = 0;
+			}
+		}
+	}
+	else if (num_checks == 0)
+		goto BLACK_LEGAL_MOVES;
+
+	// checking straights
+
+	// checking diagonals
+
+	// checking for knight checks
+
+	// black king
+BLACK_LEGAL_MOVES:
+	return;
+
+	//for (int position = 0; position < 64; ++position)
+	//{
+	//	for (int piece = 0; piece < 12; piece++)
+	//	{
+	//		if (piece == pieces::W_KING || piece == pieces::B_KING)
+	//			continue;
+
+	//		int team = WHITE;
+	//		if (piece < 6)
+	//			team = BLACK;
+
+	//		if (((OCCUPIED >> position) & pieces_[piece]) != 0)
+	//		{
+	//			for (int goal_position = 0; all_legal_moves_[position] << goal_position != 0; goal_position++)
+	//			{
+	//				// "moves" the piece
+	//				pieces_[piece] &= ~(OCCUPIED >> position);	// sets the start position to 0
+	//				pieces_[piece] |= OCCUPIED >> goal_position;	// sets the goal position to 1
+	//				
+	//				// captures
+	//				if (isEnemyAtPosition(goal_position, team))
+
+	//			}
+	//			break;
+	//		}
+	//	}
+	//}
 }
